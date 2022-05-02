@@ -9,7 +9,10 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
-		config.setTitle("jetpacksoyride");
+		config.setTitle("Jetpack-Soyride");
+		config.setWindowedMode(1280, 720);
+		config.useVsync(true);
+		config.setForegroundFPS(60);
 		new Lwjgl3Application(new MyGdxGame(), config);
 	}
 }
