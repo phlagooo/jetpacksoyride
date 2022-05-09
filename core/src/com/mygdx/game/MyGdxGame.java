@@ -83,7 +83,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 // flipX, flipY
                 false, false);
 
-        // Handle and raw obstacles
+        // Handle and draw obstacles
         for (int i = 0; i < rocks.size; i++) {
             // Check for collision
             if (steve.overlaps(rocks.get(i).bounds)) {
