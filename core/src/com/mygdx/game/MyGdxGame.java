@@ -7,16 +7,20 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.util.Random;
+
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
+import static com.mygdx.game.Rock.*;
 
 public class MyGdxGame extends ApplicationAdapter {
     private SpriteBatch batch;
     private OrthographicCamera camera;
     private Texture steveImage;
-    private Texture stoneImage;
     private Texture bgImage;
     private Rectangle steve;
     private Circle stone;
@@ -24,38 +28,53 @@ public class MyGdxGame extends ApplicationAdapter {
     private int steveSpeed;
     private final int WIDTH = 1280;
     private final int HEIGHT = 720;
-    final int BACKGROUND_SPEED = 6; //
+    private int backgroundSpeed = 6; //
     final int FLOOR_Y = 100;
+    private Array<Rock> rocks;
     float sourceX = 0; // Keep track of background
+    private Random rand = new Random();
+    private int prevRockIndex;
+
 
     @Override
     public void create() {
+        rocks = new Array<>();
+        // Create all rocks to be used
+        for (int i = 0; i < ROCK_COUNT; i++) {
+            rocks.add(new Rock(i * ((rand.nextInt(FLUCTUATION)) + MINIMUM_GAP) + WIDTH));
+        }
         batch = new SpriteBatch();
         steveImage = new Texture("badlogic.jpg");
-        stoneImage = new Texture("rock.png");
         bgImage = new Texture("background.jpg");
         bgImage.setWrap(Repeat, Repeat);
-
         camera = new OrthographicCamera();
         camera.setToOrtho(false, WIDTH, HEIGHT);
 
         steve = new Rectangle();
         steve.x = 100;
-        steve.y = 0;
-        steve.height = 50;
-        steve.width = 30;
+        steve.y = FLOOR_Y;
+        steve.width = 150;
+        steve.height = 220;
     }
 
     @Override
     public void render() {
         ScreenUtils.clear(0, 0, 0, 1);
-        sourceX += BACKGROUND_SPEED;
+        sourceX += backgroundSpeed;
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
+        // Prevent player from clipping the top of the window
+        if (steve.y + steve.height >= HEIGHT) {
+            steve.y = HEIGHT - steve.height;
+            steveSpeed += steveAcc;
+        }
+
+        // Start render
         batch.begin();
         sourceX %= bgImage.getWidth();
-        // Moving background
+
+        // Draw background
         batch.draw(bgImage,
                 // position and size of texture
                 0, 0, WIDTH, HEIGHT,
@@ -63,16 +82,34 @@ public class MyGdxGame extends ApplicationAdapter {
                 (int) sourceX, 0, bgImage.getWidth(), bgImage.getHeight(),
                 // flipX, flipY
                 false, false);
-        batch.draw(steveImage, steve.x, steve.y);
-        batch.end();
+
+        // Handle and raw obstacles
+        for (int i = 0; i < rocks.size; i++) {
+            // Check for collision
+            if (steve.overlaps(rocks.get(i).bounds)) {
+                backgroundSpeed = 0;
+                // TODO: Add game restart on death
+            }
+            // If a rock is to the left of the visible window, move it to the right of the window
+            if (rocks.get(i).getPosRock().x < -WIDTH) {
+                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP);
+            }
+            // Use reposition() in order to move the bounds as well, and not just the Texture
+            rocks.get(i).reposition(rocks.get(i).getPosRock().x - backgroundSpeed);
+            // Index the rightmost rock
+            prevRockIndex = i;
+            batch.draw(rocks.get(i).getRock(), rocks.get(i).getPosRock().x, ROCK_Y, ROCK_WIDTH, ROCK_HEIGHT);
+        }
+        batch.draw(steveImage, steve.x, steve.y, steve.width, steve.height);
+        batch.end(); // Frame finished
 
         // Jump
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             steveSpeed = 1200;
         }
 
+        // Handle gravity
         steve.y += steveSpeed * Gdx.graphics.getDeltaTime();
-
         if (steve.y > FLOOR_Y) {
             steveSpeed += steveAcc;
         } else if (steve.y == FLOOR_Y) {
