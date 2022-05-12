@@ -4,12 +4,13 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -42,6 +43,8 @@ public class MyGdxGame extends ApplicationAdapter {
     private int xStartPos = 100;
     private int yStartPos = FLOOR_Y;
     private int deathCount;
+    private int survive;
+    private BitmapFont font;
 
 
     @Override
@@ -57,6 +60,8 @@ public class MyGdxGame extends ApplicationAdapter {
         bgImage.setWrap(Repeat, Repeat);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, WIDTH, HEIGHT);
+        font = new BitmapFont();
+        font.setColor(Color.BLACK);
         mainMusic = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
@@ -77,6 +82,8 @@ public class MyGdxGame extends ApplicationAdapter {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
+
+
         // Prevent player from clipping the top of the window
         if (steve.y + steve.height >= HEIGHT) {
             steve.y = HEIGHT - steve.height;
@@ -86,6 +93,7 @@ public class MyGdxGame extends ApplicationAdapter {
         // Start render
         batch.begin();
         sourceX %= bgImage.getWidth();
+
 
         // Draw background
         batch.draw(bgImage,
@@ -100,6 +108,7 @@ public class MyGdxGame extends ApplicationAdapter {
         collisionLogic();
 
         batch.draw(steveImage, steve.x, steve.y, steve.width, steve.height);
+        font.draw(batch, Integer.toString(survive/60), WIDTH - 30, HEIGHT - 20);
         batch.end(); // Frame finished
 
         // Jump
@@ -121,12 +130,14 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     private void collisionLogic() {
+      survive++;
       for (int i = 0; i < rocks.size; i++) {
             // Check for collision
             if (steve.overlaps(rocks.get(i).bounds)) {
                 deathSound.play();
                 deathCount++;
                 sourceX = 0;
+                survive = 0;
                 // Randomly arrange all crates to the right of the screen
                 for (int j = 0; j < rocks.size; j++) {
                     rocks.get(j).reposition((j+1) * (rand.nextInt(FLUCTUATION) + MINIMUM_GAP) + WIDTH);
