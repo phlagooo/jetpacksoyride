@@ -50,7 +50,7 @@ public class MyGdxGame extends ApplicationAdapter {
             rocks.add(new Rock((i+1) * (rand.nextInt(FLUCTUATION) + MINIMUM_GAP) + WIDTH));
         }
         batch = new SpriteBatch();
-        steveImage = new Texture("badlogic.jpg");
+        steveImage = new Texture("belle.png");
         bgImage = new Texture("background.jpg");
         bgImage.setWrap(Repeat, Repeat);
         camera = new OrthographicCamera();
@@ -132,7 +132,7 @@ public class MyGdxGame extends ApplicationAdapter {
             }
             // If a rock is to the left of the visible window, move it to the right of the window
             if (rocks.get(i).getPosRock().x < -WIDTH) {
-                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP);
+                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP + 400);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
             rocks.get(i).reposition(rocks.get(i).getPosRock().x - backgroundSpeed);
