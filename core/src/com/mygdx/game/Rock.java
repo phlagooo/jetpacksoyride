@@ -14,8 +14,8 @@ public class Rock {
     public Rectangle bounds;
 
     // Obstacle placement
-    public static final int FLUCTUATION = 500;
-    public static final int MINIMUM_GAP = 500; // Min gap between two obstacles
+    public static final int FLUCTUATION = 300;
+    public static final int MINIMUM_GAP = 600; // Min gap between two obstacles
 
     // Constructor
     public Rock(float x) {
