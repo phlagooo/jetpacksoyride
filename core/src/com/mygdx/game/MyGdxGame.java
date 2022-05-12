@@ -42,7 +42,6 @@ public class MyGdxGame extends ApplicationAdapter {
     private int deathCount;
 
 
-
     @Override
     public void create() {
         rocks = new Array<>();
@@ -94,30 +93,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 false, false);
 
         // Handle and draw obstacles
-        for (int i = 0; i < rocks.size; i++) {
-            // Check for collision
-            if (steve.overlaps(rocks.get(i).bounds)) {
-                //backgroundSpeed = 0;
-                deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
-                deathSound.play();
-                deathCount++;
-
-                sourceX = 0;
-                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP + rand.nextInt(deathCount*1000));
-
-
-                // TODO: Add game restart on death
-            }
-            // If a rock is to the left of the visible window, move it to the right of the window
-            if (rocks.get(i).getPosRock().x < -WIDTH) {
-                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP);
-            }
-            // Use reposition() in order to move the bounds as well, and not just the Texture
-            rocks.get(i).reposition(rocks.get(i).getPosRock().x - backgroundSpeed);
-            // Index the rightmost rock
-            prevRockIndex = i;
-            batch.draw(rocks.get(i).getRock(), rocks.get(i).getPosRock().x, ROCK_Y, ROCK_WIDTH, ROCK_HEIGHT);
-        }
+        collisionLogic();
         batch.draw(steveImage, steve.x, steve.y, steve.width, steve.height);
         batch.end(); // Frame finished
 
@@ -135,6 +111,28 @@ public class MyGdxGame extends ApplicationAdapter {
         } else if (steve.y < FLOOR_Y) {
             steveSpeed = 0;
             steve.y = FLOOR_Y;
+        }
+    }
+
+    private void collisionLogic() {
+        deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
+        for (int i = 0; i < rocks.size; i++) {
+            // Check for collision
+            if (steve.overlaps(rocks.get(i).bounds)) {
+                deathSound.play();
+                deathCount++;
+                sourceX = 0;
+                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP + rand.nextInt(deathCount*100));
+            }
+            // If a rock is to the left of the visible window, move it to the right of the window
+            if (rocks.get(i).getPosRock().x < -WIDTH) {
+                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP);
+            }
+            // Use reposition() in order to move the bounds as well, and not just the Texture
+            rocks.get(i).reposition(rocks.get(i).getPosRock().x - backgroundSpeed);
+            // Index the rightmost rock
+            prevRockIndex = i;
+            batch.draw(rocks.get(i).getRock(), rocks.get(i).getPosRock().x, ROCK_Y, ROCK_WIDTH, ROCK_HEIGHT);
         }
     }
 
