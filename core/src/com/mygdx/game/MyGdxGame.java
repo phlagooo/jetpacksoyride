@@ -47,7 +47,7 @@ public class MyGdxGame extends ApplicationAdapter {
         rocks = new Array<>();
         // Create all rocks to be used
         for (int i = 0; i < ROCK_COUNT; i++) {
-            rocks.add(new Rock(i * ((rand.nextInt(FLUCTUATION)) + MINIMUM_GAP) + WIDTH));
+            rocks.add(new Rock((i+1) * (rand.nextInt(FLUCTUATION) + MINIMUM_GAP) + WIDTH));
         }
         batch = new SpriteBatch();
         steveImage = new Texture("belle.png");
@@ -63,7 +63,7 @@ public class MyGdxGame extends ApplicationAdapter {
         steve.x = xStartPos;
         steve.y = yStartPos;
         steve.width = 150;
-        steve.height = 220;
+        steve.height = 180;
     }
 
     @Override
@@ -94,6 +94,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
         // Handle and draw obstacles
         collisionLogic();
+
         batch.draw(steveImage, steve.x, steve.y, steve.width, steve.height);
         batch.end(); // Frame finished
 
@@ -115,14 +116,19 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     private void collisionLogic() {
-        deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
-        for (int i = 0; i < rocks.size; i++) {
+      deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
+      for (int i = 0; i < rocks.size; i++) {
             // Check for collision
             if (steve.overlaps(rocks.get(i).bounds)) {
+                //backgroundSpeed = 0;
                 deathSound.play();
                 deathCount++;
                 sourceX = 0;
-                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP + rand.nextInt(deathCount*100));
+                // Randomly arrange all crates to the right of the screen
+                for (int j = 0; j < rocks.size; j++) {
+                    rocks.get(j).reposition((j+1) * (rand.nextInt(FLUCTUATION) + MINIMUM_GAP) + WIDTH);
+                }
+                break;
             }
             // If a rock is to the left of the visible window, move it to the right of the window
             if (rocks.get(i).getPosRock().x < -WIDTH) {
