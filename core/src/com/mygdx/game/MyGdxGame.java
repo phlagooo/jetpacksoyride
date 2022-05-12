@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -34,6 +35,7 @@ public class MyGdxGame extends ApplicationAdapter {
     float sourceX = 0; // Keep track of background
     private Random rand = new Random();
     private int prevRockIndex;
+    private Music mainMusic;
 
 
     @Override
@@ -49,6 +51,9 @@ public class MyGdxGame extends ApplicationAdapter {
         bgImage.setWrap(Repeat, Repeat);
         camera = new OrthographicCamera();
         camera.setToOrtho(false, WIDTH, HEIGHT);
+        mainMusic = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
+        mainMusic.setLooping(true);
+        mainMusic.play();
 
         steve = new Rectangle();
         steve.x = 100;
@@ -88,6 +93,7 @@ public class MyGdxGame extends ApplicationAdapter {
             // Check for collision
             if (steve.overlaps(rocks.get(i).bounds)) {
                 backgroundSpeed = 0;
+
                 // TODO: Add game restart on death
             }
             // If a rock is to the left of the visible window, move it to the right of the window
