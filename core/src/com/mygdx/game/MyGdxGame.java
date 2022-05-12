@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -36,7 +37,8 @@ public class MyGdxGame extends ApplicationAdapter {
     private Random rand = new Random();
     private int prevRockIndex;
     private Music mainMusic;
-    private Music deathSound;
+    private Sound deathSound;
+    private Sound jumpSound;
     private int xStartPos = 100;
     private int yStartPos = FLOOR_Y;
     private int deathCount;
@@ -100,6 +102,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
         // Jump
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
+            jumpSound.play();
             steveSpeed = 1200;
         }
 
@@ -116,11 +120,10 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     private void collisionLogic() {
-      deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
+      deathSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
       for (int i = 0; i < rocks.size; i++) {
             // Check for collision
             if (steve.overlaps(rocks.get(i).bounds)) {
-                //backgroundSpeed = 0;
                 deathSound.play();
                 deathCount++;
                 sourceX = 0;
