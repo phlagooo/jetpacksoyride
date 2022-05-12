@@ -36,6 +36,11 @@ public class MyGdxGame extends ApplicationAdapter {
     private Random rand = new Random();
     private int prevRockIndex;
     private Music mainMusic;
+    private Music deathSound;
+    private int xStartPos = 100;
+    private int yStartPos = FLOOR_Y;
+    private int deathCount;
+
 
 
     @Override
@@ -56,8 +61,8 @@ public class MyGdxGame extends ApplicationAdapter {
         mainMusic.play();
 
         steve = new Rectangle();
-        steve.x = 100;
-        steve.y = FLOOR_Y;
+        steve.x = xStartPos;
+        steve.y = yStartPos;
         steve.width = 150;
         steve.height = 220;
     }
@@ -92,7 +97,14 @@ public class MyGdxGame extends ApplicationAdapter {
         for (int i = 0; i < rocks.size; i++) {
             // Check for collision
             if (steve.overlaps(rocks.get(i).bounds)) {
-                backgroundSpeed = 0;
+                //backgroundSpeed = 0;
+                deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
+                deathSound.play();
+                deathCount++;
+
+                sourceX = 0;
+                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP + rand.nextInt(deathCount*1000));
+
 
                 // TODO: Add game restart on death
             }
