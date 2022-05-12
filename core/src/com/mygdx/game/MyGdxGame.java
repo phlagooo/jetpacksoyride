@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -37,7 +38,8 @@ public class MyGdxGame extends ApplicationAdapter {
     private Random rand = new Random();
     private int prevRockIndex;
     private Music mainMusic;
-    private Music deathSound;
+    private Sound deathSound;
+    private Sound jumpSound;
     private int xStartPos = 100;
     private int yStartPos = FLOOR_Y;
     private int deathCount;
@@ -53,7 +55,7 @@ public class MyGdxGame extends ApplicationAdapter {
             rocks.add(new Rock((i+1) * (rand.nextInt(FLUCTUATION) + MINIMUM_GAP) + WIDTH));
         }
         batch = new SpriteBatch();
-        steveImage = new Texture("badlogic.jpg");
+        steveImage = new Texture("belle.png");
         bgImage = new Texture("background.jpg");
         bgImage.setWrap(Repeat, Repeat);
         camera = new OrthographicCamera();
@@ -109,6 +111,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
         // Jump
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
+            jumpSound.play();
             steveSpeed = 1200;
         }
 
@@ -130,7 +134,6 @@ public class MyGdxGame extends ApplicationAdapter {
       for (int i = 0; i < rocks.size; i++) {
             // Check for collision
             if (steve.overlaps(rocks.get(i).bounds)) {
-                //backgroundSpeed = 0;
                 deathSound.play();
                 deathCount++;
                 sourceX = 0;
@@ -143,7 +146,7 @@ public class MyGdxGame extends ApplicationAdapter {
             }
             // If a rock is to the left of the visible window, move it to the right of the window
             if (rocks.get(i).getPosRock().x < -WIDTH) {
-                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP);
+                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(FLUCTUATION) + MINIMUM_GAP + 400);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
             rocks.get(i).reposition(rocks.get(i).getPosRock().x - backgroundSpeed);
