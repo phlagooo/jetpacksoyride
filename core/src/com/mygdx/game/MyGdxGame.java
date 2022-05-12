@@ -93,11 +93,34 @@ public class MyGdxGame extends ApplicationAdapter {
                 false, false);
 
         // Handle and draw obstacles
-        for (int i = 0; i < rocks.size; i++) {
+        collisionLogic();
+
+        batch.draw(steveImage, steve.x, steve.y, steve.width, steve.height);
+        batch.end(); // Frame finished
+
+        // Jump
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            steveSpeed = 1200;
+        }
+
+        // Handle gravity
+        steve.y += steveSpeed * Gdx.graphics.getDeltaTime();
+        if (steve.y > FLOOR_Y) {
+            steveSpeed += steveAcc;
+        } else if (steve.y == FLOOR_Y) {
+            steveSpeed = 0;
+        } else if (steve.y < FLOOR_Y) {
+            steveSpeed = 0;
+            steve.y = FLOOR_Y;
+        }
+    }
+
+    private void collisionLogic() {
+      deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
+      for (int i = 0; i < rocks.size; i++) {
             // Check for collision
             if (steve.overlaps(rocks.get(i).bounds)) {
                 //backgroundSpeed = 0;
-                deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
                 deathSound.play();
                 deathCount++;
                 sourceX = 0;
@@ -116,24 +139,6 @@ public class MyGdxGame extends ApplicationAdapter {
             // Index the rightmost rock
             prevRockIndex = i;
             batch.draw(rocks.get(i).getRock(), rocks.get(i).getPosRock().x, ROCK_Y, ROCK_WIDTH, ROCK_HEIGHT);
-        }
-        batch.draw(steveImage, steve.x, steve.y, steve.width, steve.height);
-        batch.end(); // Frame finished
-
-        // Jump
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            steveSpeed = 1200;
-        }
-
-        // Handle gravity
-        steve.y += steveSpeed * Gdx.graphics.getDeltaTime();
-        if (steve.y > FLOOR_Y) {
-            steveSpeed += steveAcc;
-        } else if (steve.y == FLOOR_Y) {
-            steveSpeed = 0;
-        } else if (steve.y < FLOOR_Y) {
-            steveSpeed = 0;
-            steve.y = FLOOR_Y;
         }
     }
 
