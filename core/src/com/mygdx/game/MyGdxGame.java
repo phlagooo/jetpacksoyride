@@ -63,6 +63,8 @@ public class MyGdxGame extends ApplicationAdapter {
         font = new BitmapFont();
         font.setColor(Color.BLACK);
         mainMusic = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
+        deathSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
+        jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
         mainMusic.setLooping(true);
         mainMusic.play();
 
@@ -111,7 +113,6 @@ public class MyGdxGame extends ApplicationAdapter {
 
         // Jump
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
             jumpSound.play();
             steveSpeed = 1200;
         }
@@ -129,7 +130,6 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     private void collisionLogic() {
-      deathSound = Gdx.audio.newMusic(Gdx.files.internal("death.mp3"));
       survive++;
       for (int i = 0; i < rocks.size; i++) {
             // Check for collision
