@@ -101,6 +101,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 deathSound.play();
                 deathCount++;
                 sourceX = 0;
+                // Randomly arrange all crates to the right of the screen
                 for (int j = 0; j < rocks.size; j++) {
                     rocks.get(j).reposition((j+1) * (rand.nextInt(FLUCTUATION) + MINIMUM_GAP) + WIDTH);
                 }
