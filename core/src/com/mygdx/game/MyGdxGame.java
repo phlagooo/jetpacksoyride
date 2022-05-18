@@ -73,6 +73,8 @@ public class MyGdxGame extends ApplicationAdapter {
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
         // Reference: https://gamedev.stackexchange.com/questions/136659/is-it-possible-to-use-animated-gif-images-in-lbgdx
         runAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal("run.gif").read());
+        fallAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal("fall.gif").read());
+        currentSteveAnimationState = runAnimation;
         jump = new Texture("jump.png");
         mainMusic.setLooping(true);
         mainMusic.setVolume(0.6f);
@@ -115,11 +117,12 @@ public class MyGdxGame extends ApplicationAdapter {
         // Handle and draw obstacles
         collisionLogic();
 
-        if (steve.y > FLOOR_Y) {
-            // Steve is in the air
+        if (steve.y > FLOOR_Y && steve_y_speed >= 0) {
+            // Steve moving upwards
             batch.draw(jump, steve.x, steve.y, steve.width, steve.height);
         } else {
-            batch.draw(runAnimation.getKeyFrame(elapsedTime), steve.x, steve.y, steve.width, steve.height);
+            // Steve is either running or falling
+            batch.draw(currentSteveAnimationState.getKeyFrame(elapsedTime), steve.x, steve.y, steve.width, steve.height);
         }
         font.draw(batch, Integer.toString(survivedFrames / 60), WIDTH - 30, HEIGHT - 20);
         batch.end(); // Frame finished
