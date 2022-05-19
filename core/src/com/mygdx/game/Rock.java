@@ -1,8 +1,6 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -11,13 +9,14 @@ public class Rock {
     private final Vector2 pos;
     public static final int ROCK_HEIGHT = 150;
     public static final int ROCK_WIDTH = 150;
-    public static final int ROCK_COUNT = 4;
+    public static final int ROCK_COUNT = 3;
     public static final int ROCK_Y = 90;
     public Rectangle bounds;
 
+
     // Obstacle placement
-    public static final int FLUCTUATION = 300;
-    public static final int MINIMUM_GAP = 600; // Min gap between two obstacles
+    public static final int ROCKFLUCTUATION = 300;
+    public static final int ROCKMINIMUM_GAP = 600; // Min gap between two obstacles
 
     // Constructor
     public Rock(float x) {
