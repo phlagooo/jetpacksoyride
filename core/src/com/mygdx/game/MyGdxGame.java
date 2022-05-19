@@ -21,6 +21,7 @@ import java.util.Random;
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
 import static com.mygdx.game.Fireball.*;
 import static com.mygdx.game.Rock.*;
+import static com.mygdx.game.Coin.*;
 
 public class MyGdxGame extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -38,15 +39,18 @@ public class MyGdxGame extends ApplicationAdapter {
     private int fireballSpeed = 14; //
 
     final int FLOOR_Y = 100;
-    private Array<Rock> rocks;
+    private Array<Rock> rocks;    
+    private Array<Coin> coins;
     private Fireball fireball;
     float sourceX = 0; // Keep track of background
     private Random rand = new Random();
     private int prevRockIndex;
+    private int prevCoinIndex;
     private Music mainMusic;
     private Sound deathSound;
     private Sound jumpSound;
     float elapsedTime;
+    private Sound coinSound;
     private int xStartPos = 100;
     private int yStartPos = FLOOR_Y;
     private int deathCount;
@@ -64,9 +68,13 @@ public class MyGdxGame extends ApplicationAdapter {
     @Override
     public void create() {
         rocks = new Array<>();
-        // Create all rocks to be used
+        coins = new Array<>();
+        // Create all rocks and coins to be used
         for (int i = 0; i < ROCK_COUNT; i++) {
             rocks.add(new Rock((i+1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH));
+        }
+        for (int i = 0; i < COIN_COUNT; i++) {
+            coins.add(new Coin((i+1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION)));
         }
         fireball = new Fireball(WIDTH, 0);
         batch = new SpriteBatch();
@@ -88,6 +96,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
         currentSteveAnimationState = runAnimation;
         jump = new Texture("jump.png");
+        coinSound = Gdx.audio.newSound(Gdx.files.internal("coin.mp3"));
         mainMusic.setLooping(true);
         mainMusic.setVolume(0.2f);
         mainMusic.play();
@@ -148,7 +157,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 false, false);
 
         // Handle and draw obstacles
-        handleRock();
+        handleRockAndCoins();
 
         if (fireballLive) {
             timeSinceFireballStart += Gdx.graphics.getDeltaTime();
@@ -205,7 +214,7 @@ public class MyGdxGame extends ApplicationAdapter {
         }
     }
 
-    private void handleRock() {
+    private void handleRockAndCoins() {
         survivedFrames++;
         for (int i = 0; i < rocks.size; i++) {
             // Check for collision
@@ -223,6 +232,23 @@ public class MyGdxGame extends ApplicationAdapter {
             // Index the rightmost rock
             prevRockIndex = i;
             batch.draw(rocks.get(i).getRock(), rocks.get(i).getPosRock().x, ROCK_Y, ROCK_WIDTH, ROCK_HEIGHT);
+        }
+        for (int i = 0; i < coins.size; i++) {
+            // Check for collision
+            if (steve.overlaps(coins.get(i).bounds)) {
+                survive *= 2;
+                coinSound.play();
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP + 400, 200 + rand.nextInt(COINFLUCTUATION));
+            }
+            // If a coin is to the left of the visible window, move it to the right of the window
+            if (coins.get(i).getPosCoin().x < -WIDTH) {
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP + 400, coins.get(i).getPosCoin().y);
+            }
+            // Use reposition() in order to move the bounds as well, and not just the Texture
+            coins.get(i).reposition(coins.get(i).getPosCoin().x - backgroundSpeed, coins.get(i).getPosCoin().y);
+            // Index the rightmost coin
+            prevCoinIndex = i;
+            batch.draw(coins.get(i).getCoin(), coins.get(i).getPosCoin().x, coins.get(i).getPosCoin().y, COIN_WIDTH, COIN_HEIGHT);
         }
     }
 
