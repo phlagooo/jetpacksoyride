@@ -168,6 +168,7 @@ public class MyGdxGame extends ApplicationAdapter {
         // Handle and draw obstacles
         handleRock();
         handleCoins();
+        handlePotion();
 
         if (fireballLive) {
             timeSinceFireballStart += Gdx.graphics.getDeltaTime();
@@ -263,6 +264,9 @@ public class MyGdxGame extends ApplicationAdapter {
             prevCoinIndex = i;
             batch.draw(coins.get(i).getCoin(), coins.get(i).getPosCoin().x, coins.get(i).getPosCoin().y, COIN_WIDTH, COIN_HEIGHT);
         }
+    }
+
+    private void handlePotion() {
         for (int i = 0; i < potions.size; i++) {
             // Check for collision
             if (steve.overlaps(potions.get(i).bounds)) {
@@ -288,6 +292,7 @@ public class MyGdxGame extends ApplicationAdapter {
         sourceX = 0;
         survivedFrames = 0;
         fireballLive = false;
+        backgroundSpeed = 6;
         fireball.reposition(WIDTH * 2,
                 rand.nextInt(HEIGHT - FIREBALL_HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
         // Randomly arrange all crates to the right of the screen
