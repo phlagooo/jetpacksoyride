@@ -173,7 +173,7 @@ public class MyGdxGame extends ApplicationAdapter {
             // Steve is either running or falling
             batch.draw(currentSteveAnimationState.getKeyFrame(elapsedTime), steve.x, steve.y, steve.width, steve.height);
         }
-        font.draw(batch, Integer.toString(survivedFrames / 60), WIDTH - 30, HEIGHT - 20);
+        font.draw(batch, Integer.toString(survivedFrames / 60), WIDTH - 70, HEIGHT - 20);
         batch.end(); // Frame finished
     }
 
