@@ -39,7 +39,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private int fireballSpeed = 14; //
 
     final int FLOOR_Y = 100;
-    private Array<Rock> rocks;    
+    private Array<Rock> rocks;
     private Array<Coin> coins;
     private Fireball fireball;
     float sourceX = 0; // Keep track of background
@@ -71,10 +71,10 @@ public class MyGdxGame extends ApplicationAdapter {
         coins = new Array<>();
         // Create all rocks and coins to be used
         for (int i = 0; i < ROCK_COUNT; i++) {
-            rocks.add(new Rock((i+1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH));
+            rocks.add(new Rock((i + 1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH));
         }
         for (int i = 0; i < COIN_COUNT; i++) {
-            coins.add(new Coin((i+1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION)));
+            coins.add(new Coin((i + 1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION)));
         }
         fireball = new Fireball(WIDTH, 0);
         batch = new SpriteBatch();
@@ -157,7 +157,8 @@ public class MyGdxGame extends ApplicationAdapter {
                 false, false);
 
         // Handle and draw obstacles
-        handleRockAndCoins();
+        handleRock();
+        handleCoins();
 
         if (fireballLive) {
             timeSinceFireballStart += Gdx.graphics.getDeltaTime();
@@ -214,7 +215,7 @@ public class MyGdxGame extends ApplicationAdapter {
         }
     }
 
-    private void handleRockAndCoins() {
+    private void handleRock() {
         survivedFrames++;
         for (int i = 0; i < rocks.size; i++) {
             // Check for collision
@@ -233,12 +234,15 @@ public class MyGdxGame extends ApplicationAdapter {
             prevRockIndex = i;
             batch.draw(rocks.get(i).getRock(), rocks.get(i).getPosRock().x, ROCK_Y, ROCK_WIDTH, ROCK_HEIGHT);
         }
+    }
+
+    private void handleCoins() {
         for (int i = 0; i < coins.size; i++) {
             // Check for collision
             if (steve.overlaps(coins.get(i).bounds)) {
-                survive *= 2;
+                survivedFrames *= 2;
                 coinSound.play();
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP + 400, 200 + rand.nextInt(COINFLUCTUATION));
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP + 400, coins.get(i).getPosCoin().y);
             }
             // If a coin is to the left of the visible window, move it to the right of the window
             if (coins.get(i).getPosCoin().x < -WIDTH) {
@@ -262,7 +266,10 @@ public class MyGdxGame extends ApplicationAdapter {
                 rand.nextInt(HEIGHT - FIREBALL_HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
         // Randomly arrange all crates to the right of the screen
         for (int j = 0; j < rocks.size; j++) {
-            rocks.get(j).reposition((j+1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH);
+            rocks.get(j).reposition((j + 1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH);
+        }
+        for (int i = 0; i < COIN_COUNT; i++) {
+            coins.get(i).reposition((i + 1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION));
         }
     }
 
