@@ -7,14 +7,14 @@ import com.badlogic.gdx.math.Vector2;
 public class Coin {
     private final Texture coin;
     private final Vector2 pos;
-    public static final int COIN_HEIGHT = 150;
-    public static final int COIN_WIDTH = 150;
+    public static final int COIN_HEIGHT = 100;
+    public static final int COIN_WIDTH = 100;
     public static final int COIN_COUNT = 2;
     public Rectangle bounds;
 
     // Obstacle placement
-    public static final int COINFLUCTUATION = 300;
-    public static final int COINMINIMUM_GAP = 1000; // Min gap between two obstacles
+    public static final int COIN_FLUCTUATION = 300;
+    public static final int COIN_MINIMUM_GAP = 800; // Min gap between two obstacles
 
     // Constructor
     public Coin(float x, float y) {

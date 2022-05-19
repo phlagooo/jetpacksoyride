@@ -20,7 +20,7 @@ import java.util.Random;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
 import static com.mygdx.game.Fireball.*;
-import static com.mygdx.game.Rock.*;
+import static com.mygdx.game.Crate.*;
 import static com.mygdx.game.Coin.*;
 import static com.mygdx.game.Potion.*;
 
@@ -40,13 +40,13 @@ public class MyGdxGame extends ApplicationAdapter {
     private int fireballSpeed = 14; //
 
     final int FLOOR_Y = 100;
-    private Array<Rock> rocks;
+    private Array<Crate> crates;
     private Array<Coin> coins;
     private Fireball fireball;
     private Array<Potion> potions;
     float sourceX = 0; // Keep track of background
     private Random rand = new Random();
-    private int prevRockIndex;
+    private int prevCrateIndex;
     private int prevCoinIndex;
     private int prevPotionIndex;
     private Music mainMusic;
@@ -71,18 +71,18 @@ public class MyGdxGame extends ApplicationAdapter {
 
     @Override
     public void create() {
-        rocks = new Array<>();
+        crates = new Array<>();
         coins = new Array<>();
         potions = new Array<>();
-        // Create all rocks and coins to be used
-        for (int i = 0; i < ROCK_COUNT; i++) {
-            rocks.add(new Rock((i + 1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH));
+        // Create all crates and coins to be used
+        for (int i = 0; i < CRATE_COUNT; i++) {
+            crates.add(new Crate((i + 1) * (rand.nextInt(CRATE_FLUCTUATION) + CRATE_MINIMUM_GAP) + WIDTH));
         }
         for (int i = 0; i < POTION_COUNT; i++) {
-            potions.add(new Potion((i + 1) * (rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP) + WIDTH));
+            potions.add(new Potion((i + 1) * (rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP) + WIDTH));
         }
         for (int i = 0; i < COIN_COUNT; i++) {
-            coins.add(new Coin((i + 1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION)));
+            coins.add(new Coin((i + 1) * (rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COIN_FLUCTUATION)));
         }
         fireball = new Fireball(WIDTH, 0);
         batch = new SpriteBatch();
@@ -166,7 +166,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 false, false);
 
         // Handle and draw obstacles
-        handleRock();
+        handleCrate();
         handleCoins();
         handlePotion();
 
@@ -225,24 +225,24 @@ public class MyGdxGame extends ApplicationAdapter {
         }
     }
 
-    private void handleRock() {
+    private void handleCrate() {
         survivedFrames++;
-        for (int i = 0; i < rocks.size; i++) {
+        for (int i = 0; i < crates.size; i++) {
             // Check for collision
-            if (steve.overlaps(rocks.get(i).bounds)) {
+            if (steve.overlaps(crates.get(i).bounds)) {
                 resetGame();
                 break;
             }
-            // If a rock is to the left of the visible window, move it to the right of the window
-            if (rocks.get(i).getPosRock().x < -WIDTH) {
-                rocks.get(i).reposition(rocks.get(prevRockIndex).getPosRock().x + rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP + 400);
+            // If a crate is to the left of the visible window, move it to the right of the window
+            if (crates.get(i).getPosCrate().x < -WIDTH) {
+                crates.get(i).reposition(crates.get(prevCrateIndex).getPosCrate().x + rand.nextInt(CRATE_FLUCTUATION) + CRATE_MINIMUM_GAP + 400);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
-            rocks.get(i).reposition(rocks.get(i).getPosRock().x - backgroundSpeed);
+            crates.get(i).reposition(crates.get(i).getPosCrate().x - backgroundSpeed);
 
-            // Index the rightmost rock
-            prevRockIndex = i;
-            batch.draw(rocks.get(i).getRock(), rocks.get(i).getPosRock().x, ROCK_Y, ROCK_WIDTH, ROCK_HEIGHT);
+            // Index the rightmost crate
+            prevCrateIndex = i;
+            batch.draw(crates.get(i).getCrate(), crates.get(i).getPosCrate().x, CRATE_Y, CRATE_WIDTH, CRATE_HEIGHT);
         }
     }
 
@@ -252,11 +252,11 @@ public class MyGdxGame extends ApplicationAdapter {
             if (steve.overlaps(coins.get(i).bounds)) {
                 survivedFrames *= 2;
                 coinSound.play();
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP, 200 + rand.nextInt(COINFLUCTUATION));
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, 200 + rand.nextInt(COIN_FLUCTUATION));
             }
             // If a coin is to the left of the visible window, move it to the right of the window
             if (coins.get(i).getPosCoin().x < -WIDTH) {
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP, coins.get(i).getPosCoin().y);
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, coins.get(i).getPosCoin().y);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
             coins.get(i).reposition(coins.get(i).getPosCoin().x - backgroundSpeed, coins.get(i).getPosCoin().y);
@@ -271,17 +271,17 @@ public class MyGdxGame extends ApplicationAdapter {
             // Check for collision
             if (steve.overlaps(potions.get(i).bounds)) {
                 powerUpSound.play();
-                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP);
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
                 backgroundSpeed += 3;
                 fireballSpeed += 3;
             }
-            // If a rock is to the left of the visible window, move it to the right of the window
-            if (potions.get(i).getPosPotion().x < -WIDTH || rocks.get(i).bounds.overlaps(potions.get(i).bounds)) {
-                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP);
+            // If a crate is to the left of the visible window, move it to the right of the window
+            if (potions.get(i).getPosPotion().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
             potions.get(i).reposition(potions.get(i).getPosPotion().x - backgroundSpeed);
-            // Index the rightmost rock
+            // Index the rightmost crate
             prevPotionIndex = i;
             batch.draw(potions.get(i).getPotion(), potions.get(i).getPosPotion().x, POTION_Y, POTION_WIDTH, POTION_HEIGHT);
         }
@@ -297,14 +297,14 @@ public class MyGdxGame extends ApplicationAdapter {
         fireball.reposition(WIDTH * 2,
                 rand.nextInt(HEIGHT - FIREBALL_HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
         // Randomly arrange all crates to the right of the screen
-        for (int j = 0; j < rocks.size; j++) {
-            rocks.get(j).reposition((j + 1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH);
+        for (int j = 0; j < crates.size; j++) {
+            crates.get(j).reposition((j + 1) * (rand.nextInt(CRATE_FLUCTUATION) + CRATE_MINIMUM_GAP) + WIDTH);
         }
         for (int i = 0; i < COIN_COUNT; i++) {
-            coins.get(i).reposition((i + 1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION));
+            coins.get(i).reposition((i + 1) * (rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COIN_FLUCTUATION));
         }
         for (int i = 0; i < POTION_COUNT; i++) {
-            potions.get(i).reposition((i + 1) * (rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP) + WIDTH);
+            potions.get(i).reposition((i + 1) * (rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP) + WIDTH);
         }
     }
 
