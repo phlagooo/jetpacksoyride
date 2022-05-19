@@ -273,8 +273,8 @@ public class MyGdxGame extends ApplicationAdapter {
             if (steve.overlaps(potions.get(i).bounds)) {
                 powerUpSound.play();
                 potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
-                backgroundSpeed += 2;
-                fireballSpeed += 2;
+                backgroundSpeed += POTION_SPEEDUP;
+                fireballSpeed += POTION_SPEEDUP;
             }
             // If a potion is to the left of the visible window, move it to the right of the window
             if (potions.get(i).getPosPotion().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {

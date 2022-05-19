@@ -9,10 +9,11 @@ import com.badlogic.gdx.math.Vector2;
 public class Potion {
     private final Texture potion;
     private final Vector2 pos;
-    public static final int POTION_HEIGHT = 100;
-    public static final int POTION_WIDTH = 100;
+    public static final int POTION_HEIGHT = 75;
+    public static final int POTION_WIDTH = 75;
     public static final int POTION_COUNT = 1;
     public static final int POTION_Y = 90;
+    public static final int POTION_SPEEDUP = 2;
     public Rectangle bounds;
 
     // Obstacle placement
