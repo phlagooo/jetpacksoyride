@@ -9,12 +9,12 @@ public class Coin {
     private final Vector2 pos;
     public static final int COIN_HEIGHT = 100;
     public static final int COIN_WIDTH = 100;
-    public static final int COIN_COUNT = 2;
+    public static final int COIN_COUNT = 1;
     public Rectangle bounds;
 
     // Obstacle placement
-    public static final int COIN_FLUCTUATION = 300;
-    public static final int COIN_MINIMUM_GAP = 800; // Min gap between two obstacles
+    public static final int COIN_FLUCTUATION = 400;
+    public static final int COIN_MINIMUM_GAP = 1000; // Min gap between two obstacles
 
     // Constructor
     public Coin(float x, float y) {
