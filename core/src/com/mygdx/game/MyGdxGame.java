@@ -3,15 +3,18 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -25,12 +28,18 @@ import static com.mygdx.game.Coin.*;
 import static com.mygdx.game.Potion.*;
 
 public class MyGdxGame extends ApplicationAdapter {
+
+    enum Screen{
+        TITLE, MAIN_GAME, GAME_OVER;
+    }
+    Screen currentScreen = Screen.TITLE;
+
     private SpriteBatch batch;
     private OrthographicCamera camera;
     private Texture bgImage;
     private Rectangle steve;
     //private Circle stone;
-    private int steveAcc = -80;
+    private final int steveAcc = -80;
     private int steve_y_speed;
     private final int WIDTH = 1280;
     private final int HEIGHT = 720;
@@ -38,14 +47,22 @@ public class MyGdxGame extends ApplicationAdapter {
     private final int WARNING_HEIGHT = 100;
     private int backgroundSpeed = 6;
     private int fireballSpeed = 14; //
-
+    private final int CRATE_COUNT = 3;
+    private final int CRATE_FLUCTUATION = 300;
+    private final int CRATE_MINIMUM_GAP = 600;
+    private final int POTION_COUNT = 1;
+    private final int POTION_FLUCTUATION = 300;
+    private final int POTION_MINIMUM_GAP = 10000;
+    private final int COIN_COUNT = 1;
+    private final int COIN_FLUCTUATION = 300;
+    private final int COIN_MINIMUM_GAP = 800;
     final int FLOOR_Y = 100;
     private Array<Crate> crates;
     private Array<Coin> coins;
     private Fireball fireball;
     private Array<Potion> potions;
     float sourceX = 0; // Keep track of background
-    private Random rand = new Random();
+    private final Random rand = new Random();
     private int prevCrateIndex;
     private int prevCoinIndex;
     private int prevPotionIndex;
@@ -55,8 +72,8 @@ public class MyGdxGame extends ApplicationAdapter {
     private Sound powerUpSound;
     float elapsedTime;
     private Sound coinSound;
-    private int xStartPos = 100;
-    private int yStartPos = FLOOR_Y;
+    private final int xStartPos = 100;
+    private final int yStartPos = FLOOR_Y;
     private int deathCount;
     private int survivedFrames;
     private BitmapFont font;
@@ -68,6 +85,10 @@ public class MyGdxGame extends ApplicationAdapter {
     Animation<TextureRegion> currentSteveAnimationState;
     Animation<TextureRegion> runAnimation;
     Animation<TextureRegion> fallAnimation;
+
+    float circleX = 300;
+    float circleY = 150;
+    float circleRadius = 50;
 
     @Override
     public void create() {
@@ -115,40 +136,83 @@ public class MyGdxGame extends ApplicationAdapter {
         steve.y = yStartPos;
         steve.width = 140;
         steve.height = 140;
+
+        Gdx.input.setInputProcessor(new InputAdapter() {
+
+            @Override
+            public boolean keyDown (int keyCode) {
+
+                if(currentScreen == Screen.TITLE && keyCode == Input.Keys.SPACE){
+                    currentScreen = Screen.MAIN_GAME;
+                }
+                else if(currentScreen == Screen.GAME_OVER && keyCode == Input.Keys.ENTER){
+                    currentScreen = Screen.TITLE;
+                }
+
+                return true;
+            }
+
+            @Override
+            public boolean touchDown (int x, int y, int pointer, int button) {
+                if(currentScreen == Screen.MAIN_GAME){
+                    int renderY = Gdx.graphics.getHeight() - y;
+                    if(Vector2.dst(circleX, circleY, x, renderY) < circleRadius){
+                        currentScreen = Screen.GAME_OVER;
+                    }
+                }
+                return true;
+            }
+        });
     }
 
     @Override
     public void render() {
-        if (!fireballLive && survivedFrames % 60 == 1) {
-            int fireballOdds = rand.nextInt(4);
-            if (fireballOdds == 1) {
-                fireballLive = true;
-                timeSinceFireballStart = 0;
-                fireball.reposition(WIDTH, rand.nextInt(HEIGHT - FIREBALL_HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
+        if(currentScreen == Screen.TITLE){
+            ScreenUtils.clear(0, .25f, 0, 1);
+            batch.begin();
+            font.draw(batch, "Title Screen!", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .75f);
+            font.draw(batch, "Click the circle to win.", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .5f);
+            font.draw(batch, "Press space to play.", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .25f);
+            batch.end();
+        }else if(currentScreen == Screen.MAIN_GAME) {
+            if (!fireballLive && survivedFrames % 60 == 1) {
+                int fireballOdds = rand.nextInt(4);
+                if (fireballOdds == 1) {
+                    fireballLive = true;
+                    timeSinceFireballStart = 0;
+                    fireball.reposition(WIDTH, rand.nextInt(HEIGHT - fireball.HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
+                }
             }
+
+            ScreenUtils.clear(0, 0, 0, 1);
+            elapsedTime += Gdx.graphics.getDeltaTime();
+            sourceX += backgroundSpeed;
+            camera.update();
+            batch.setProjectionMatrix(camera.combined);
+
+            // Prevent player from clipping the top of the window
+            if (steve.y + steve.height >= HEIGHT) {
+                steve.y = HEIGHT - steve.height;
+                steve_y_speed += steveAcc;
+            }
+
+            drawFrame();
+
+            // Jump
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                jumpSound.play(0.1f);
+                steve_y_speed = 1200;
+            }
+
+            handleGravity();
+        }else if(currentScreen == Screen.GAME_OVER){
+            ScreenUtils.clear(.25f, 0, 0, 1);
+
+            batch.begin();
+            font.draw(batch, "You win!", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .75f);
+            font.draw(batch, "Press enter to restart.", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .25f);
+            batch.end();
         }
-
-        ScreenUtils.clear(0, 0, 0, 1);
-        elapsedTime += Gdx.graphics.getDeltaTime();
-        sourceX += backgroundSpeed;
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
-
-        // Prevent player from clipping the top of the window
-        if (steve.y + steve.height >= HEIGHT) {
-            steve.y = HEIGHT - steve.height;
-            steve_y_speed += steveAcc;
-        }
-
-        drawFrame();
-
-        // Jump
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            jumpSound.play(0.1f);
-            steve_y_speed = 1200;
-        }
-
-        handleGravity();
     }
 
     private void drawFrame() {
@@ -206,21 +270,21 @@ public class MyGdxGame extends ApplicationAdapter {
         if (timeSinceFireballStart < 3) { // Show warning sign for 3 seconds
             batch.draw(warningAnimation.getKeyFrame(timeSinceFireballStart),
                     WIDTH - WARNING_WIDTH - 50,
-                    fireball.getY(),
+                    fireball.getPos().y,
                     WARNING_WIDTH,
                     WARNING_HEIGHT);
         } else {
             if (steve.overlaps(fireball.bounds)) {
                 resetGame();
-            } else if (fireball.getX() < -WIDTH) {
+            } else if (fireball.getPos().x < -WIDTH) {
                 fireballLive = false;
             } else {
-                fireball.reposition(fireball.getX() - fireballSpeed, fireball.getY());
+                fireball.reposition(fireball.getPos().x - fireballSpeed, fireball.getPos().y);
                 batch.draw(fireball.getFireball().getKeyFrame(elapsedTime),
-                        fireball.getX(),
-                        fireball.getY(),
-                        FIREBALL_WIDTH,
-                        FIREBALL_HEIGHT);
+                        fireball.getPos().x,
+                        fireball.getPos().y,
+                        fireball.WIDTH,
+                        fireball.HEIGHT);
             }
         }
     }
@@ -234,15 +298,15 @@ public class MyGdxGame extends ApplicationAdapter {
                 break;
             }
             // If a crate is to the left of the visible window, move it to the right of the window
-            if (crates.get(i).getPosCrate().x < -WIDTH) {
-                crates.get(i).reposition(crates.get(prevCrateIndex).getPosCrate().x + rand.nextInt(CRATE_FLUCTUATION) + CRATE_MINIMUM_GAP + 400);
+            if (crates.get(i).getPos().x < -WIDTH) {
+                crates.get(i).reposition(crates.get(prevCrateIndex).getPos().x + rand.nextInt(CRATE_FLUCTUATION) + CRATE_MINIMUM_GAP + 400);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
-            crates.get(i).reposition(crates.get(i).getPosCrate().x - backgroundSpeed);
+            crates.get(i).reposition(crates.get(i).getPos().x - backgroundSpeed);
 
             // Index the rightmost crate
             prevCrateIndex = i;
-            batch.draw(crates.get(i).getCrate(), crates.get(i).getPosCrate().x, CRATE_Y, CRATE_WIDTH, CRATE_HEIGHT);
+            batch.draw(crates.get(i).get(), crates.get(i).getPos().x, CRATE_Y, crates.get(i).WIDTH, crates.get(i).HEIGHT);
         }
     }
 
@@ -252,17 +316,17 @@ public class MyGdxGame extends ApplicationAdapter {
             if (steve.overlaps(coins.get(i).bounds)) {
                 survivedFrames *= 2;
                 coinSound.play();
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, 200 + rand.nextInt(COIN_FLUCTUATION));
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPos().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, 200 + rand.nextInt(COIN_FLUCTUATION));
             }
             // If a coin is to the left of the visible window, move it to the right of the window
-            if (coins.get(i).getPosCoin().x < -WIDTH) {
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, coins.get(i).getPosCoin().y);
+            if (coins.get(i).getPos().x < -WIDTH) {
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPos().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, coins.get(i).getPos().y);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
-            coins.get(i).reposition(coins.get(i).getPosCoin().x - backgroundSpeed, coins.get(i).getPosCoin().y);
+            coins.get(i).reposition(coins.get(i).getPos().x - backgroundSpeed, coins.get(i).getPos().y);
             // Index the rightmost coin
             prevCoinIndex = i;
-            batch.draw(coins.get(i).getCoin(), coins.get(i).getPosCoin().x, coins.get(i).getPosCoin().y, COIN_WIDTH, COIN_HEIGHT);
+            batch.draw(coins.get(i).get(), coins.get(i).getPos().x, coins.get(i).getPos().y, coins.get(i).WIDTH, coins.get(i).HEIGHT);
         }
     }
 
@@ -271,19 +335,19 @@ public class MyGdxGame extends ApplicationAdapter {
             // Check for collision
             if (steve.overlaps(potions.get(i).bounds)) {
                 powerUpSound.play();
-                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPos().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
                 backgroundSpeed += 3;
                 fireballSpeed += 3;
             }
             // If a crate is to the left of the visible window, move it to the right of the window
-            if (potions.get(i).getPosPotion().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {
-                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
+            if (potions.get(i).getPos().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPos().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
-            potions.get(i).reposition(potions.get(i).getPosPotion().x - backgroundSpeed);
+            potions.get(i).reposition(potions.get(i).getPos().x - backgroundSpeed);
             // Index the rightmost crate
             prevPotionIndex = i;
-            batch.draw(potions.get(i).getPotion(), potions.get(i).getPosPotion().x, POTION_Y, POTION_WIDTH, POTION_HEIGHT);
+            batch.draw(potions.get(i).get(), potions.get(i).getPos().x, POTION_Y, potions.get(i).WIDTH, potions.get(i).HEIGHT);
         }
     }
 
@@ -295,7 +359,7 @@ public class MyGdxGame extends ApplicationAdapter {
         fireballLive = false;
         backgroundSpeed = 6;
         fireball.reposition(WIDTH * 2,
-                rand.nextInt(HEIGHT - FIREBALL_HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
+                rand.nextInt(HEIGHT - fireball.HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
         // Randomly arrange all crates to the right of the screen
         for (int j = 0; j < crates.size; j++) {
             crates.get(j).reposition((j + 1) * (rand.nextInt(CRATE_FLUCTUATION) + CRATE_MINIMUM_GAP) + WIDTH);
@@ -306,6 +370,7 @@ public class MyGdxGame extends ApplicationAdapter {
         for (int i = 0; i < POTION_COUNT; i++) {
             potions.get(i).reposition((i + 1) * (rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP) + WIDTH);
         }
+        currentScreen = Screen.GAME_OVER;
     }
 
     @Override
