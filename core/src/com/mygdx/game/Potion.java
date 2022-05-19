@@ -16,8 +16,8 @@ public class Potion {
     public Rectangle bounds;
 
     // Obstacle placement
-    public static final int POTIONFLUCTUATION = 300;
-    public static final int POTIONMINIMUM_GAP = 10000; // Min gap between two obstacles
+    public static final int POTION_FLUCTUATION = 300;
+    public static final int POTION_MINIMUM_GAP = 10000; // Min gap between two obstacles
 
     // Constructor
     public Potion(float x) {

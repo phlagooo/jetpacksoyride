@@ -6,14 +6,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
-import static com.mygdx.game.Rock.ROCK_HEIGHT;
-import static com.mygdx.game.Rock.ROCK_Y;
+import static com.mygdx.game.Crate.CRATE_HEIGHT;
+import static com.mygdx.game.Crate.CRATE_Y;
 
 public class Fireball {
     private final Vector2 pos;
     public static final int FIREBALL_HEIGHT = 90;
     public static final int FIREBALL_WIDTH = 235;
-    public static final int MIN_Y_VALUE = ROCK_Y + ROCK_HEIGHT;
+    public static final int MIN_Y_VALUE = CRATE_Y + CRATE_HEIGHT;
     public Rectangle bounds;
     Animation<TextureRegion> fireballAnimation;
 
