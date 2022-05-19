@@ -79,7 +79,7 @@ public class MyGdxGame extends ApplicationAdapter {
             rocks.add(new Rock((i + 1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH));
         }
         for (int i = 0; i < POTION_COUNT; i++) {
-            potions.add(new Potion((i+1) * (rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP) + WIDTH));
+            potions.add(new Potion((i + 1) * (rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP) + WIDTH));
         }
         for (int i = 0; i < COIN_COUNT; i++) {
             coins.add(new Coin((i + 1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION)));
@@ -251,11 +251,11 @@ public class MyGdxGame extends ApplicationAdapter {
             if (steve.overlaps(coins.get(i).bounds)) {
                 survivedFrames *= 2;
                 coinSound.play();
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP, 200 + rand.nextInt(COINFLUCTUATION));
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP + 400, coins.get(i).getPosCoin().y);
             }
             // If a coin is to the left of the visible window, move it to the right of the window
             if (coins.get(i).getPosCoin().x < -WIDTH) {
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP, coins.get(i).getPosCoin().y);
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP + 400, coins.get(i).getPosCoin().y);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
             coins.get(i).reposition(coins.get(i).getPosCoin().x - backgroundSpeed, coins.get(i).getPosCoin().y);
@@ -288,6 +288,7 @@ public class MyGdxGame extends ApplicationAdapter {
         sourceX = 0;
         survivedFrames = 0;
         fireballLive = false;
+        backgroundSpeed = 6;
         fireball.reposition(WIDTH * 2,
                 rand.nextInt(HEIGHT - FIREBALL_HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
         // Randomly arrange all crates to the right of the screen
