@@ -14,7 +14,7 @@ public class Coin {
 
     // Obstacle placement
     public static final int COINFLUCTUATION = 300;
-    public static final int COINMINIMUM_GAP = 600; // Min gap between two obstacles
+    public static final int COINMINIMUM_GAP = 1000; // Min gap between two obstacles
 
     // Constructor
     public Coin(float x, float y) {

@@ -22,6 +22,7 @@ import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
 import static com.mygdx.game.Fireball.*;
 import static com.mygdx.game.Rock.*;
 import static com.mygdx.game.Coin.*;
+import static com.mygdx.game.Potion.*;
 
 public class MyGdxGame extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -42,13 +43,16 @@ public class MyGdxGame extends ApplicationAdapter {
     private Array<Rock> rocks;
     private Array<Coin> coins;
     private Fireball fireball;
+    private Array<Potion> potions;
     float sourceX = 0; // Keep track of background
     private Random rand = new Random();
     private int prevRockIndex;
     private int prevCoinIndex;
+    private int prevPotionIndex;
     private Music mainMusic;
     private Sound deathSound;
     private Sound jumpSound;
+    private Sound powerUpSound;
     float elapsedTime;
     private Sound coinSound;
     private int xStartPos = 100;
@@ -69,9 +73,13 @@ public class MyGdxGame extends ApplicationAdapter {
     public void create() {
         rocks = new Array<>();
         coins = new Array<>();
+        potions = new Array<>();
         // Create all rocks and coins to be used
         for (int i = 0; i < ROCK_COUNT; i++) {
             rocks.add(new Rock((i + 1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH));
+        }
+        for (int i = 0; i < POTION_COUNT; i++) {
+            potions.add(new Potion((i+1) * (rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP) + WIDTH));
         }
         for (int i = 0; i < COIN_COUNT; i++) {
             coins.add(new Coin((i + 1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION)));
@@ -88,6 +96,7 @@ public class MyGdxGame extends ApplicationAdapter {
         mainMusic = Gdx.audio.newMusic(Gdx.files.internal("joyrideTheme.mp3"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
+        powerUpSound = Gdx.audio.newSound(Gdx.files.internal("powerup.mp3"));
 
         // Reference: https://gamedev.stackexchange.com/questions/136659/is-it-possible-to-use-animated-gif-images-in-lbgdx
         runAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal("run.gif").read());
@@ -242,17 +251,34 @@ public class MyGdxGame extends ApplicationAdapter {
             if (steve.overlaps(coins.get(i).bounds)) {
                 survivedFrames *= 2;
                 coinSound.play();
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP + 400, coins.get(i).getPosCoin().y);
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP, 200 + rand.nextInt(COINFLUCTUATION));
             }
             // If a coin is to the left of the visible window, move it to the right of the window
             if (coins.get(i).getPosCoin().x < -WIDTH) {
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP + 400, coins.get(i).getPosCoin().y);
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP, coins.get(i).getPosCoin().y);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
             coins.get(i).reposition(coins.get(i).getPosCoin().x - backgroundSpeed, coins.get(i).getPosCoin().y);
             // Index the rightmost coin
             prevCoinIndex = i;
             batch.draw(coins.get(i).getCoin(), coins.get(i).getPosCoin().x, coins.get(i).getPosCoin().y, COIN_WIDTH, COIN_HEIGHT);
+        }
+        for (int i = 0; i < potions.size; i++) {
+            // Check for collision
+            if (steve.overlaps(potions.get(i).bounds)) {
+                powerUpSound.play();
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP);
+                backgroundSpeed += 3;
+            }
+            // If a rock is to the left of the visible window, move it to the right of the window
+            if (potions.get(i).getPosPotion().x < -WIDTH || rocks.get(i).bounds.overlaps(potions.get(i).bounds)) {
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP);
+            }
+            // Use reposition() in order to move the bounds as well, and not just the Texture
+            potions.get(i).reposition(potions.get(i).getPosPotion().x - backgroundSpeed);
+            // Index the rightmost rock
+            prevPotionIndex = i;
+            batch.draw(potions.get(i).getPotion(), potions.get(i).getPosPotion().x, POTION_Y, POTION_WIDTH, POTION_HEIGHT);
         }
     }
 
