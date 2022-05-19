@@ -79,7 +79,7 @@ public class MyGdxGame extends ApplicationAdapter {
             rocks.add(new Rock((i + 1) * (rand.nextInt(ROCKFLUCTUATION) + ROCKMINIMUM_GAP) + WIDTH));
         }
         for (int i = 0; i < POTION_COUNT; i++) {
-            potions.add(new Potion((i+1) * (rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP) + WIDTH));
+            potions.add(new Potion((i + 1) * (rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP) + WIDTH));
         }
         for (int i = 0; i < COIN_COUNT; i++) {
             coins.add(new Coin((i + 1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION)));
@@ -273,6 +273,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 powerUpSound.play();
                 potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP);
                 backgroundSpeed += 3;
+                fireballSpeed += 3;
             }
             // If a rock is to the left of the visible window, move it to the right of the window
             if (potions.get(i).getPosPotion().x < -WIDTH || rocks.get(i).bounds.overlaps(potions.get(i).bounds)) {
@@ -301,6 +302,9 @@ public class MyGdxGame extends ApplicationAdapter {
         }
         for (int i = 0; i < COIN_COUNT; i++) {
             coins.get(i).reposition((i + 1) * (rand.nextInt(COINFLUCTUATION) + COINMINIMUM_GAP) + WIDTH, 200 + rand.nextInt(COINFLUCTUATION));
+        }
+        for (int i = 0; i < POTION_COUNT; i++) {
+            potions.get(i).reposition((i + 1) * (rand.nextInt(POTIONFLUCTUATION) + POTIONMINIMUM_GAP) + WIDTH);
         }
     }
 
