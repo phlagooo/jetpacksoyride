@@ -9,15 +9,15 @@ import com.badlogic.gdx.math.Vector2;
 public class Potion {
     private final Texture potion;
     private final Vector2 pos;
-    public static final int POTION_HEIGHT = 150;
-    public static final int POTION_WIDTH = 150;
+    public static final int POTION_HEIGHT = 100;
+    public static final int POTION_WIDTH = 100;
     public static final int POTION_COUNT = 1;
     public static final int POTION_Y = 90;
     public Rectangle bounds;
 
     // Obstacle placement
-    public static final int POTION_FLUCTUATION = 300;
-    public static final int POTION_MINIMUM_GAP = 10000; // Min gap between two obstacles
+    public static final int POTION_FLUCTUATION = 10000;
+    public static final int POTION_MINIMUM_GAP = 3000; // Min gap between two obstacles
 
     // Constructor
     public Potion(float x) {
