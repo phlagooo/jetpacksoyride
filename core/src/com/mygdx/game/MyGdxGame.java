@@ -52,6 +52,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private final int POTION_COUNT = 1;
     private final int POTION_FLUCTUATION = 300;
     private final int POTION_MINIMUM_GAP = 10000;
+    public final int POTION_SPEEDUP = 2;
     private final int COIN_COUNT = 1;
     private final int COIN_FLUCTUATION = 300;
     private final int COIN_MINIMUM_GAP = 800;
@@ -362,7 +363,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 fireballSpeed += POTION_SPEEDUP;
             }
             // If a potion is to the left of the visible window, move it to the right of the window
-            if (potions.get(i).getPosPotion().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {
+            if (potions.get(i).getPos().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {
                 potions.get(i).reposition(potions.get(prevPotionIndex).getPos().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
