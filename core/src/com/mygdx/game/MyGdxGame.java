@@ -77,6 +77,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private Sound deathSound;
     private Sound jumpSound;
     private Sound powerUpSound;
+    private Music endScreenMusic;
     float elapsedTime;
     private Sound coinSound;
     private final int xStartPos = 100;
@@ -132,6 +133,8 @@ public class MyGdxGame extends ApplicationAdapter {
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
         powerUpSound = Gdx.audio.newSound(Gdx.files.internal("powerup.mp3"));
         coinSound = Gdx.audio.newSound(Gdx.files.internal("coin.mp3"));
+        endScreenMusic = Gdx.audio.newMusic(Gdx.files.internal("deaths.mp3"));
+
 
         // Reference: https://gamedev.stackexchange.com/questions/136659/is-it-possible-to-use-animated-gif-images-in-lbgdx
         runAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal("run.gif").read());
@@ -173,7 +176,6 @@ public class MyGdxGame extends ApplicationAdapter {
             }
             fontclick.draw(batch, glyphlayout, WIDTH / 2 - glyphlayout.width / 2, HEIGHT / 4 + glyphlayout.height);
             batch.end();
-
         } else if (currentScreen == Screen.MAIN_GAME) {
             mainMusic.setLooping(true);
             mainMusic.setVolume(0.2f);
@@ -210,6 +212,8 @@ public class MyGdxGame extends ApplicationAdapter {
             handleGravity();
         } else if (currentScreen == Screen.GAME_OVER) {
             mainMusic.stop();
+            endScreenMusic.play();
+            endScreenMusic.setLooping(true);
             ScreenUtils.clear(.25f, 0, 0, 1);
 
             batch.begin();
@@ -217,7 +221,7 @@ public class MyGdxGame extends ApplicationAdapter {
                     // position and size of texture
                     0, 0, WIDTH, HEIGHT);
             GlyphLayout restart = new GlyphLayout();
-            restart.setText(fontclick, "Press to restart");
+            restart.setText(fontclick, "Press space to restart");
             GlyphLayout score = new GlyphLayout();
             score.setText(font, Integer.toString(survivedFrames / 60));
             GlyphLayout scoretext = new GlyphLayout();
@@ -226,6 +230,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 fontclick.setColor(Color.WHITE);
                 if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     currentScreen = Screen.MAIN_GAME;
+                    endScreenMusic.stop();
                     survivedFrames = 0;
                     fontclick.setColor(Color.BLACK);
                 }
