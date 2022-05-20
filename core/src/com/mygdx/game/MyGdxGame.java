@@ -3,34 +3,41 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.math.Rectangle;
 
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
-import static com.mygdx.game.Fireball.*;
-import static com.mygdx.game.Crate.*;
-import static com.mygdx.game.Coin.*;
-import static com.mygdx.game.Potion.*;
+import static com.mygdx.game.Crate.CRATE_Y;
+import static com.mygdx.game.Fireball.MIN_Y_VALUE;
+import static com.mygdx.game.Potion.POTION_Y;
 
+/**
+ * A 2d endless runner with the objective of surviving as long as possible.
+ * The movement input is space to jump.
+ * Collectables:
+ * - Coins: increases the player's score
+ * - Potions: increases the player's speed
+ * Obstacles:
+ * - Crates: game ends on collision with the player
+ * - Fireballs: Sent after a short warning, game ends on collision with the player
+ */
 public class MyGdxGame extends ApplicationAdapter {
 
-    enum Screen{
-        TITLE, MAIN_GAME, GAME_OVER;
+    enum Screen {
+        TITLE, MAIN_GAME, GAME_OVER
     }
+
     Screen currentScreen = Screen.TITLE;
 
     private SpriteBatch batch;
@@ -90,6 +97,10 @@ public class MyGdxGame extends ApplicationAdapter {
 
     private ArrayList<Integer> highscores;
 
+    /**
+     * Initialize the game by spawning all objects
+     * and assigning assets
+     */
     @Override
     public void create() {
         crates = new Array<>();
@@ -115,7 +126,7 @@ public class MyGdxGame extends ApplicationAdapter {
         font.setColor(Color.BLACK);
         fontclick = new BitmapFont();
         fontclick.setColor(Color.BLACK);
-        highscores = new ArrayList<Integer>();
+        highscores = new ArrayList<>();
 
         mainMusic = Gdx.audio.newMusic(Gdx.files.internal("joyrideTheme.mp3"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
@@ -140,9 +151,12 @@ public class MyGdxGame extends ApplicationAdapter {
         steve.height = 140;
     }
 
+    /**
+     * Handle game states
+     */
     @Override
     public void render() {
-        if(currentScreen == Screen.TITLE){
+        if (currentScreen == Screen.TITLE) {
             ScreenUtils.clear(0, 0, 0, 1);
 
             batch.begin();
@@ -150,22 +164,19 @@ public class MyGdxGame extends ApplicationAdapter {
                     // position and size of texture
                     0, 0, WIDTH, HEIGHT);
             GlyphLayout glyphlayout = new GlyphLayout();
-            glyphlayout.setText(fontclick, "Press space to play");
-            //if(Gdx.input.getX() > WIDTH/2 - glyphlayout.width/2 && Gdx.input.getX() < WIDTH/2 + glyphlayout.width/2 && Gdx.input.getY() < HEIGHT - HEIGHT/4 && Gdx.input.getY() > HEIGHT - HEIGHT/4 - glyphlayout.height){
+            glyphlayout.setText(fontclick, "Press to play");
+            if (Gdx.input.getX() > WIDTH / 2 - glyphlayout.width / 2 && Gdx.input.getX() < WIDTH / 2 + glyphlayout.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - glyphlayout.height) {
                 fontclick.setColor(Color.WHITE);
-                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     currentScreen = Screen.MAIN_GAME;
                     fontclick.setColor(Color.BLACK);
-          //      }
-            }
-            else {
+                }
+            } else {
                 fontclick.setColor(Color.BLACK);
             }
-            fontclick.draw(batch, glyphlayout, WIDTH/2 - glyphlayout.width/2, HEIGHT/4 +glyphlayout.height);
+            fontclick.draw(batch, glyphlayout, WIDTH / 2 - glyphlayout.width / 2, HEIGHT / 4 + glyphlayout.height);
             batch.end();
-
-        }
-        else if (currentScreen == Screen.MAIN_GAME) {
+        } else if (currentScreen == Screen.MAIN_GAME) {
             mainMusic.setLooping(true);
             mainMusic.setVolume(0.2f);
             mainMusic.play();
@@ -199,8 +210,7 @@ public class MyGdxGame extends ApplicationAdapter {
             }
 
             handleGravity();
-        }
-        else if (currentScreen == Screen.GAME_OVER){
+        } else if (currentScreen == Screen.GAME_OVER) {
             mainMusic.stop();
             endScreenMusic.play();
             endScreenMusic.setLooping(true);
@@ -216,30 +226,29 @@ public class MyGdxGame extends ApplicationAdapter {
             score.setText(font, Integer.toString(survivedFrames / 60));
             GlyphLayout scoretext = new GlyphLayout();
             scoretext.setText(font, "Score:");
-            //if(Gdx.input.getX() > WIDTH/2 - restart.width/2 && Gdx.input.getX() < WIDTH/2 + restart.width/2 && Gdx.input.getY() < HEIGHT - HEIGHT/4 && Gdx.input.getY() > HEIGHT - HEIGHT/4 - restart.height){
+            if (Gdx.input.getX() > WIDTH / 2 - restart.width / 2 && Gdx.input.getX() < WIDTH / 2 + restart.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - restart.height) {
                 fontclick.setColor(Color.WHITE);
-                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     currentScreen = Screen.MAIN_GAME;
                     endScreenMusic.stop();
                     survivedFrames = 0;
                     fontclick.setColor(Color.BLACK);
-               // }
-            }
-                else {
+                }
+            } else {
                 fontclick.setColor(Color.BLACK);
             }
 
             GlyphLayout highscorestext = new GlyphLayout();
             highscorestext.setText(font, "Highscores:");
-            font.draw(batch, highscorestext, WIDTH / 2 - highscorestext.width / 2, HEIGHT / 4 + 420 );
+            font.draw(batch, highscorestext, WIDTH / 2 - highscorestext.width / 2, HEIGHT / 4 + 420);
             for (int i = 0; i < highscores.size(); i++) {
                 GlyphLayout highscore = new GlyphLayout();
                 highscore.setText(font, Integer.toString(highscores.get(i)));
                 font.draw(batch, highscore, WIDTH / 2 - highscore.width / 2, HEIGHT / 4 + 400 - score.height * i * 2);
             }
-            fontclick.draw(batch, restart, WIDTH/2 - restart.width/2, HEIGHT/4 +restart.height);
-            font.draw(batch, score, WIDTH/2 - score.width/2, HEIGHT/4 +score.height + 80);
-            font.draw(batch, scoretext, WIDTH/2 - scoretext.width/2, HEIGHT/4 +scoretext.height*3 + 80);
+            fontclick.draw(batch, restart, WIDTH / 2 - restart.width / 2, HEIGHT / 4 + restart.height);
+            font.draw(batch, score, WIDTH / 2 - score.width / 2, HEIGHT / 4 + score.height + 80);
+            font.draw(batch, scoretext, WIDTH / 2 - scoretext.width / 2, HEIGHT / 4 + scoretext.height * 3 + 80);
             batch.end();
         }
     }
@@ -399,13 +408,13 @@ public class MyGdxGame extends ApplicationAdapter {
         for (int i = 0; i < POTION_COUNT; i++) {
             potions.get(i).reposition((i + 1) * (rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP) + WIDTH);
         }
-        if(highscores.size() < 10){
-            highscores.add(survivedFrames/60);
+        if (highscores.size() < 10) {
+            highscores.add(survivedFrames / 60);
             Collections.sort(highscores, Collections.<Integer>reverseOrder());
-        }else {
-            if(highscores.get(9) < survivedFrames/60){
+        } else {
+            if (highscores.get(9) < survivedFrames / 60) {
                 highscores.remove(9);
-                highscores.add(survivedFrames/60);
+                highscores.add(survivedFrames / 60);
                 Collections.sort(highscores, Collections.<Integer>reverseOrder());
             }
         }
