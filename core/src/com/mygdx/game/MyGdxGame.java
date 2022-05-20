@@ -10,15 +10,14 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.awt.*;
 import java.util.Random;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
@@ -77,6 +76,7 @@ public class MyGdxGame extends ApplicationAdapter {
     private int deathCount;
     private int survivedFrames;
     private BitmapFont font;
+    private BitmapFont fontclick;
     boolean fireballLive = false;
     float timeSinceFireballStart;
     // Movement textures / animations
@@ -85,10 +85,6 @@ public class MyGdxGame extends ApplicationAdapter {
     Animation<TextureRegion> currentSteveAnimationState;
     Animation<TextureRegion> runAnimation;
     Animation<TextureRegion> fallAnimation;
-
-    float circleX = 300;
-    float circleY = 150;
-    float circleRadius = 50;
 
     @Override
     public void create() {
@@ -113,6 +109,8 @@ public class MyGdxGame extends ApplicationAdapter {
         camera.setToOrtho(false, WIDTH, HEIGHT);
         font = new BitmapFont();
         font.setColor(Color.BLACK);
+        fontclick = new BitmapFont();
+        fontclick.setColor(Color.BLACK);
 
         mainMusic = Gdx.audio.newMusic(Gdx.files.internal("joyrideTheme.mp3"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
@@ -127,54 +125,42 @@ public class MyGdxGame extends ApplicationAdapter {
         currentSteveAnimationState = runAnimation;
         jump = new Texture("jump.png");
         coinSound = Gdx.audio.newSound(Gdx.files.internal("coin.mp3"));
-        mainMusic.setLooping(true);
-        mainMusic.setVolume(0.2f);
-        mainMusic.play();
+
 
         steve = new Rectangle();
         steve.x = xStartPos;
         steve.y = yStartPos;
         steve.width = 140;
         steve.height = 140;
-
-        Gdx.input.setInputProcessor(new InputAdapter() {
-
-            @Override
-            public boolean keyDown (int keyCode) {
-
-                if(currentScreen == Screen.TITLE && keyCode == Input.Keys.SPACE){
-                    currentScreen = Screen.MAIN_GAME;
-                }
-                else if(currentScreen == Screen.GAME_OVER && keyCode == Input.Keys.ENTER){
-                    currentScreen = Screen.TITLE;
-                }
-
-                return true;
-            }
-
-            @Override
-            public boolean touchDown (int x, int y, int pointer, int button) {
-                if(currentScreen == Screen.MAIN_GAME){
-                    int renderY = Gdx.graphics.getHeight() - y;
-                    if(Vector2.dst(circleX, circleY, x, renderY) < circleRadius){
-                        currentScreen = Screen.GAME_OVER;
-                    }
-                }
-                return true;
-            }
-        });
     }
 
     @Override
     public void render() {
         if(currentScreen == Screen.TITLE){
-            ScreenUtils.clear(0, .25f, 0, 1);
+            ScreenUtils.clear(0, 0, 0, 1);
+
             batch.begin();
-            font.draw(batch, "Title Screen!", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .75f);
-            font.draw(batch, "Click the circle to win.", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .5f);
-            font.draw(batch, "Press space to play.", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .25f);
+            batch.draw(bgImage,
+                    // position and size of texture
+                    0, 0, WIDTH, HEIGHT);
+            GlyphLayout glyphlayout = new GlyphLayout();
+            glyphlayout.setText(fontclick, "Press to play");
+            if(Gdx.input.getX() > WIDTH/2 - glyphlayout.width/2 && Gdx.input.getX() < WIDTH/2 + glyphlayout.width/2 && Gdx.input.getY() < HEIGHT - HEIGHT/4 && Gdx.input.getY() > HEIGHT - HEIGHT/4 - glyphlayout.height){
+                fontclick.setColor(Color.WHITE);
+                if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+                    currentScreen = Screen.MAIN_GAME;
+                    fontclick.setColor(Color.BLACK);
+                }
+            }else{
+                fontclick.setColor(Color.BLACK);
+            }
+            fontclick.draw(batch, glyphlayout, WIDTH/2 - glyphlayout.width/2, HEIGHT/4 +glyphlayout.height);
             batch.end();
+
         }else if(currentScreen == Screen.MAIN_GAME) {
+            mainMusic.setLooping(true);
+            mainMusic.setVolume(0.2f);
+            mainMusic.play();
             if (!fireballLive && survivedFrames % 60 == 1) {
                 int fireballOdds = rand.nextInt(4);
                 if (fireballOdds == 1) {
@@ -206,11 +192,33 @@ public class MyGdxGame extends ApplicationAdapter {
 
             handleGravity();
         }else if(currentScreen == Screen.GAME_OVER){
+            mainMusic.pause();
             ScreenUtils.clear(.25f, 0, 0, 1);
 
             batch.begin();
-            font.draw(batch, "You win!", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .75f);
-            font.draw(batch, "Press enter to restart.", Gdx.graphics.getWidth()*.25f, Gdx.graphics.getHeight() * .25f);
+            batch.draw(bgImage,
+                    // position and size of texture
+                    0, 0, WIDTH, HEIGHT);
+            GlyphLayout restart = new GlyphLayout();
+            restart.setText(fontclick, "Press to restart");
+            GlyphLayout score = new GlyphLayout();
+            score.setText(font, Integer.toString(survivedFrames / 60));
+            GlyphLayout scoretext = new GlyphLayout();
+            scoretext.setText(font, "Score:");
+            if(Gdx.input.getX() > WIDTH/2 - restart.width/2 && Gdx.input.getX() < WIDTH/2 + restart.width/2 && Gdx.input.getY() < HEIGHT - HEIGHT/4 && Gdx.input.getY() > HEIGHT - HEIGHT/4 - restart.height){
+                fontclick.setColor(Color.WHITE);
+                if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+                    currentScreen = Screen.MAIN_GAME;
+                    survivedFrames = 0;
+                    fontclick.setColor(Color.BLACK);
+                }
+            }else{
+                fontclick.setColor(Color.BLACK);
+            }
+
+            fontclick.draw(batch, restart, WIDTH/2 - restart.width/2, HEIGHT/4 +restart.height);
+            font.draw(batch, score, WIDTH/2 - score.width/2, HEIGHT/4 +score.height + 80);
+            font.draw(batch, scoretext, WIDTH/2 - scoretext.width/2, HEIGHT/4 +scoretext.height*3 + 80);
             batch.end();
         }
     }
@@ -355,7 +363,6 @@ public class MyGdxGame extends ApplicationAdapter {
         deathSound.play();
         deathCount++;
         sourceX = 0;
-        survivedFrames = 0;
         fireballLive = false;
         backgroundSpeed = 6;
         fireball.reposition(WIDTH * 2,
