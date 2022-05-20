@@ -24,7 +24,7 @@ import static com.mygdx.game.Potion.POTION_Y;
 
 /**
  * A 2d endless runner with the objective of surviving as long as possible.
- * The movement input is space to jump
+ * The movement input is space to jump.
  * Collectables:
  * - Coins: increases the player's score
  * - Potions: increases the player's speed
