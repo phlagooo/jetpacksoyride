@@ -119,6 +119,10 @@ public class MyGdxGame extends ApplicationAdapter {
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
         powerUpSound = Gdx.audio.newSound(Gdx.files.internal("powerup.mp3"));
+        coinSound = Gdx.audio.newSound(Gdx.files.internal("coin.mp3"));
+        mainMusic.setLooping(true);
+        mainMusic.setVolume(0.2f);
+        mainMusic.play();
 
         // Reference: https://gamedev.stackexchange.com/questions/136659/is-it-possible-to-use-animated-gif-images-in-lbgdx
         runAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal("run.gif").read());
@@ -127,8 +131,6 @@ public class MyGdxGame extends ApplicationAdapter {
 
         currentSteveAnimationState = runAnimation;
         jump = new Texture("jump.png");
-        coinSound = Gdx.audio.newSound(Gdx.files.internal("coin.mp3"));
-
 
         steve = new Rectangle();
         steve.x = xStartPos;
@@ -235,6 +237,8 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     private void drawFrame() {
+        survivedFrames++;
+
         // Start render
         batch.begin();
         sourceX %= bgImage.getWidth();
@@ -309,7 +313,6 @@ public class MyGdxGame extends ApplicationAdapter {
     }
 
     private void handleCrate() {
-        survivedFrames++;
         for (int i = 0; i < crates.size; i++) {
             // Check for collision
             if (steve.overlaps(crates.get(i).bounds)) {
@@ -333,9 +336,9 @@ public class MyGdxGame extends ApplicationAdapter {
         for (int i = 0; i < coins.size; i++) {
             // Check for collision
             if (steve.overlaps(coins.get(i).bounds)) {
-                survivedFrames *= 2;
                 coinSound.play();
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPos().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, 200 + rand.nextInt(COIN_FLUCTUATION));
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, 200 + rand.nextInt(COIN_FLUCTUATION));
+                survivedFrames *= 2;
             }
             // If a coin is to the left of the visible window, move it to the right of the window
             if (coins.get(i).getPos().x < -WIDTH) {
@@ -354,13 +357,13 @@ public class MyGdxGame extends ApplicationAdapter {
             // Check for collision
             if (steve.overlaps(potions.get(i).bounds)) {
                 powerUpSound.play();
-                potions.get(i).reposition(potions.get(prevPotionIndex).getPos().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
-                backgroundSpeed += 3;
-                fireballSpeed += 3;
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
+                backgroundSpeed += POTION_SPEEDUP;
+                fireballSpeed += POTION_SPEEDUP;
             }
-            // If a crate is to the left of the visible window, move it to the right of the window
-            if (potions.get(i).getPos().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {
-                potions.get(i).reposition(potions.get(prevPotionIndex).getPos().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
+            // If a potion is to the left of the visible window, move it to the right of the window
+            if (potions.get(i).getPosPotion().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
             potions.get(i).reposition(potions.get(i).getPos().x - backgroundSpeed);
