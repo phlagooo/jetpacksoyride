@@ -121,9 +121,6 @@ public class MyGdxGame extends ApplicationAdapter {
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("jump (on chicken).mp3"));
         powerUpSound = Gdx.audio.newSound(Gdx.files.internal("powerup.mp3"));
         coinSound = Gdx.audio.newSound(Gdx.files.internal("coin.mp3"));
-        mainMusic.setLooping(true);
-        mainMusic.setVolume(0.2f);
-        mainMusic.play();
 
         // Reference: https://gamedev.stackexchange.com/questions/136659/is-it-possible-to-use-animated-gif-images-in-lbgdx
         runAnimation = GifDecoder.loadGIFAnimation(Animation.PlayMode.LOOP, Gdx.files.internal("run.gif").read());
@@ -198,7 +195,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
             handleGravity();
         }else if(currentScreen == Screen.GAME_OVER){
-            mainMusic.pause();
+            mainMusic.stop();
             ScreenUtils.clear(.25f, 0, 0, 1);
 
             batch.begin();
