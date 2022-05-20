@@ -126,6 +126,7 @@ public class MyGdxGame extends ApplicationAdapter {
         font.setColor(Color.BLACK);
         fontclick = new BitmapFont();
         fontclick.setColor(Color.BLACK);
+        fontclick.getData().setScale(3);
         highscores = new ArrayList<>();
 
         mainMusic = Gdx.audio.newMusic(Gdx.files.internal("joyrideTheme.mp3"));
@@ -165,12 +166,12 @@ public class MyGdxGame extends ApplicationAdapter {
                     0, 0, WIDTH, HEIGHT);
             GlyphLayout glyphlayout = new GlyphLayout();
             glyphlayout.setText(fontclick, "Press to play");
-            //if (Gdx.input.getX() > WIDTH / 2 - glyphlayout.width / 2 && Gdx.input.getX() < WIDTH / 2 + glyphlayout.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - glyphlayout.height) {
+            if (Gdx.input.getX() > WIDTH / 2 - glyphlayout.width / 2 && Gdx.input.getX() < WIDTH / 2 + glyphlayout.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - glyphlayout.height) {
                 fontclick.setColor(Color.WHITE);
-                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     currentScreen = Screen.MAIN_GAME;
                     fontclick.setColor(Color.BLACK);
-              //  }
+                }
             } else {
                 fontclick.setColor(Color.BLACK);
             }
@@ -221,19 +222,19 @@ public class MyGdxGame extends ApplicationAdapter {
                     // position and size of texture
                     0, 0, WIDTH, HEIGHT);
             GlyphLayout restart = new GlyphLayout();
-            restart.setText(fontclick, "Press space to restart");
+            restart.setText(fontclick, "Press to restart");
             GlyphLayout score = new GlyphLayout();
             score.setText(font, Integer.toString(survivedFrames / 60));
             GlyphLayout scoretext = new GlyphLayout();
             scoretext.setText(font, "Score:");
-            //if (Gdx.input.getX() > WIDTH / 2 - restart.width / 2 && Gdx.input.getX() < WIDTH / 2 + restart.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - restart.height) {
+            if (Gdx.input.getX() > WIDTH / 2 - restart.width / 2 && Gdx.input.getX() < WIDTH / 2 + restart.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - restart.height) {
                 fontclick.setColor(Color.WHITE);
-                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     currentScreen = Screen.MAIN_GAME;
                     endScreenMusic.stop();
                     survivedFrames = 0;
                     fontclick.setColor(Color.BLACK);
-               // }
+                }
             } else {
                 fontclick.setColor(Color.BLACK);
             }
