@@ -165,9 +165,11 @@ public class MyGdxGame extends ApplicationAdapter {
                     // position and size of texture
                     0, 0, WIDTH, HEIGHT);
             GlyphLayout glyphlayout = new GlyphLayout();
-            glyphlayout.setText(fontclick, "Press to play");
+            glyphlayout.setText(fontclick, "Play");
+            // Highlight text with white color when hovering it
             if (Gdx.input.getX() > WIDTH / 2 - glyphlayout.width / 2 && Gdx.input.getX() < WIDTH / 2 + glyphlayout.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - glyphlayout.height) {
                 fontclick.setColor(Color.WHITE);
+                // Start game if text is pressed
                 if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
                     currentScreen = Screen.MAIN_GAME;
                     fontclick.setColor(Color.BLACK);
@@ -222,7 +224,7 @@ public class MyGdxGame extends ApplicationAdapter {
                     // position and size of texture
                     0, 0, WIDTH, HEIGHT);
             GlyphLayout restart = new GlyphLayout();
-            restart.setText(fontclick, "Press to restart");
+            restart.setText(fontclick, "Restart");
             GlyphLayout score = new GlyphLayout();
             score.setText(font, Integer.toString(survivedFrames / 60));
             GlyphLayout scoretext = new GlyphLayout();
@@ -239,6 +241,7 @@ public class MyGdxGame extends ApplicationAdapter {
                 fontclick.setColor(Color.BLACK);
             }
 
+            // Display highscores
             GlyphLayout highscorestext = new GlyphLayout();
             highscorestext.setText(font, "Highscores:");
             font.draw(batch, highscorestext, WIDTH / 2 - highscorestext.width / 2, HEIGHT / 4 + 420);
@@ -399,7 +402,7 @@ public class MyGdxGame extends ApplicationAdapter {
         backgroundSpeed = 6;
         fireball.reposition(WIDTH * 2,
                 rand.nextInt(HEIGHT - fireball.HEIGHT - MIN_Y_VALUE) + MIN_Y_VALUE);
-        // Randomly arrange all crates to the right of the screen
+        // Randomly arrange all crates, coins and potions to the right of the screen
         for (int j = 0; j < crates.size; j++) {
             crates.get(j).reposition((j + 1) * (rand.nextInt(CRATE_FLUCTUATION) + CRATE_MINIMUM_GAP) + WIDTH);
         }
@@ -409,6 +412,8 @@ public class MyGdxGame extends ApplicationAdapter {
         for (int i = 0; i < POTION_COUNT; i++) {
             potions.get(i).reposition((i + 1) * (rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP) + WIDTH);
         }
+
+        // If score is top 10 of the play session add it to the high scores and sort the list
         if (highscores.size() < 10) {
             highscores.add(survivedFrames / 60);
             Collections.sort(highscores, Collections.<Integer>reverseOrder());
