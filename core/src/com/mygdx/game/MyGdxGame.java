@@ -337,7 +337,7 @@ public class MyGdxGame extends ApplicationAdapter {
             // Check for collision
             if (steve.overlaps(coins.get(i).bounds)) {
                 coinSound.play();
-                coins.get(i).reposition(coins.get(prevCoinIndex).getPosCoin().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, 200 + rand.nextInt(COIN_FLUCTUATION));
+                coins.get(i).reposition(coins.get(prevCoinIndex).getPos().x + rand.nextInt(COIN_FLUCTUATION) + COIN_MINIMUM_GAP, 200 + rand.nextInt(COIN_FLUCTUATION));
                 survivedFrames *= 2;
             }
             // If a coin is to the left of the visible window, move it to the right of the window
@@ -357,13 +357,13 @@ public class MyGdxGame extends ApplicationAdapter {
             // Check for collision
             if (steve.overlaps(potions.get(i).bounds)) {
                 powerUpSound.play();
-                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPos().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
                 backgroundSpeed += POTION_SPEEDUP;
                 fireballSpeed += POTION_SPEEDUP;
             }
             // If a potion is to the left of the visible window, move it to the right of the window
             if (potions.get(i).getPosPotion().x < -WIDTH || crates.get(i).bounds.overlaps(potions.get(i).bounds)) {
-                potions.get(i).reposition(potions.get(prevPotionIndex).getPosPotion().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
+                potions.get(i).reposition(potions.get(prevPotionIndex).getPos().x + rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP);
             }
             // Use reposition() in order to move the bounds as well, and not just the Texture
             potions.get(i).reposition(potions.get(i).getPos().x - backgroundSpeed);
