@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.math.Rectangle;
 
 import java.awt.*;
-import java.util.Random;
+import java.util.*;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
 import static com.mygdx.game.Fireball.*;
@@ -86,6 +86,8 @@ public class MyGdxGame extends ApplicationAdapter {
     Animation<TextureRegion> runAnimation;
     Animation<TextureRegion> fallAnimation;
 
+    private ArrayList<Integer> highscores;
+
     @Override
     public void create() {
         crates = new Array<>();
@@ -111,6 +113,7 @@ public class MyGdxGame extends ApplicationAdapter {
         font.setColor(Color.BLACK);
         fontclick = new BitmapFont();
         fontclick.setColor(Color.BLACK);
+        highscores = new ArrayList<Integer>();
 
         mainMusic = Gdx.audio.newMusic(Gdx.files.internal("joyrideTheme.mp3"));
         deathSound = Gdx.audio.newSound(Gdx.files.internal("death.mp3"));
@@ -216,6 +219,14 @@ public class MyGdxGame extends ApplicationAdapter {
                 fontclick.setColor(Color.BLACK);
             }
 
+            GlyphLayout highscorestext = new GlyphLayout();
+            highscorestext.setText(font, "Highscores:");
+            font.draw(batch, highscorestext, WIDTH / 2 - highscorestext.width / 2, HEIGHT / 4 + 420 );
+            for (int i = 0; i < highscores.size(); i++) {
+                GlyphLayout highscore = new GlyphLayout();
+                highscore.setText(font, Integer.toString(highscores.get(i)));
+                font.draw(batch, highscore, WIDTH / 2 - highscore.width / 2, HEIGHT / 4 + 400 - score.height * i * 2);
+            }
             fontclick.draw(batch, restart, WIDTH/2 - restart.width/2, HEIGHT/4 +restart.height);
             font.draw(batch, score, WIDTH/2 - score.width/2, HEIGHT/4 +score.height + 80);
             font.draw(batch, scoretext, WIDTH/2 - scoretext.width/2, HEIGHT/4 +scoretext.height*3 + 80);
@@ -376,6 +387,16 @@ public class MyGdxGame extends ApplicationAdapter {
         }
         for (int i = 0; i < POTION_COUNT; i++) {
             potions.get(i).reposition((i + 1) * (rand.nextInt(POTION_FLUCTUATION) + POTION_MINIMUM_GAP) + WIDTH);
+        }
+        if(highscores.size() < 10){
+            highscores.add(survivedFrames/60);
+            Collections.sort(highscores, Collections.<Integer>reverseOrder());
+        }else {
+            if(highscores.get(9) < survivedFrames/60){
+                highscores.remove(9);
+                highscores.add(survivedFrames/60);
+                Collections.sort(highscores, Collections.<Integer>reverseOrder());
+            }
         }
         currentScreen = Screen.GAME_OVER;
     }
