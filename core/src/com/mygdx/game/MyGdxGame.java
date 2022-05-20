@@ -165,12 +165,12 @@ public class MyGdxGame extends ApplicationAdapter {
                     0, 0, WIDTH, HEIGHT);
             GlyphLayout glyphlayout = new GlyphLayout();
             glyphlayout.setText(fontclick, "Press to play");
-            if (Gdx.input.getX() > WIDTH / 2 - glyphlayout.width / 2 && Gdx.input.getX() < WIDTH / 2 + glyphlayout.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - glyphlayout.height) {
+            //if (Gdx.input.getX() > WIDTH / 2 - glyphlayout.width / 2 && Gdx.input.getX() < WIDTH / 2 + glyphlayout.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - glyphlayout.height) {
                 fontclick.setColor(Color.WHITE);
-                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     currentScreen = Screen.MAIN_GAME;
                     fontclick.setColor(Color.BLACK);
-                }
+              //  }
             } else {
                 fontclick.setColor(Color.BLACK);
             }
@@ -226,14 +226,14 @@ public class MyGdxGame extends ApplicationAdapter {
             score.setText(font, Integer.toString(survivedFrames / 60));
             GlyphLayout scoretext = new GlyphLayout();
             scoretext.setText(font, "Score:");
-            if (Gdx.input.getX() > WIDTH / 2 - restart.width / 2 && Gdx.input.getX() < WIDTH / 2 + restart.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - restart.height) {
+            //if (Gdx.input.getX() > WIDTH / 2 - restart.width / 2 && Gdx.input.getX() < WIDTH / 2 + restart.width / 2 && Gdx.input.getY() < HEIGHT - HEIGHT / 4 && Gdx.input.getY() > HEIGHT - HEIGHT / 4 - restart.height) {
                 fontclick.setColor(Color.WHITE);
-                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     currentScreen = Screen.MAIN_GAME;
                     endScreenMusic.stop();
                     survivedFrames = 0;
                     fontclick.setColor(Color.BLACK);
-                }
+               // }
             } else {
                 fontclick.setColor(Color.BLACK);
             }
